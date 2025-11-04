@@ -8,8 +8,10 @@ import { BarBoxChild } from 'src/components/bar/types';
 import options from 'src/configuration';
 import { runAsyncCommand } from '../../utils/input/commandExecutor';
 import { throttledScrollHandler } from '../../utils/input/throttle';
+import { NetworkService } from 'src/services/network';
 
 const networkService = AstalNetwork.get_default();
+const vpnService = NetworkService.getInstance();
 const { label, truncation, truncation_size, rightClick, middleClick, scrollDown, scrollUp, showWifiInfo } =
     options.bar.network;
 
@@ -21,8 +23,17 @@ const Network = (): BarBoxChild => {
         },
     );
 
-    const NetworkIcon = (): JSX.Element => (
-        <icon className={'bar-button-icon network-icon'} icon={iconBinding()} />
+    const networkIcon = Variable.derive(
+        [bind(vpnService.vpn.activeVpn), bind(iconBinding)],
+        (activeVpn, icon) => {
+            if (activeVpn) {
+                return <label className={'bar-button-icon network-icon'} label="󰖂 " />;
+            }
+            if (!icon || icon === '') {
+                return <box />;
+            }
+            return <icon className={'bar-button-icon network-icon'} icon={icon} />;
+        },
     );
 
     const networkLabel = Variable.derive(
@@ -35,12 +46,19 @@ const Network = (): BarBoxChild => {
 
             bind(networkService, 'state'),
             bind(networkService, 'connectivity'),
+            bind(vpnService.vpn.activeVpn),
             ...(networkService.wifi !== null ? [bind(networkService.wifi, 'enabled')] : []),
         ],
-        (primaryNetwork, showLabel, trunc, tSize, showWifiInfo) => {
+        (primaryNetwork, showLabel, trunc, tSize, showWifiInfo, _state, _connectivity, activeVpn) => {
             if (!showLabel) {
                 return <box />;
             }
+
+            // Check if VPN is active first
+            if (activeVpn) {
+                return <label className={'bar-button-label network-label'} label={activeVpn} />;
+            }
+
             if (primaryNetwork === AstalNetwork.Primary.WIRED) {
                 return (
                     <label className={'bar-button-label network-label'} label={'Wired'.substring(0, tSize)} />
@@ -92,11 +110,12 @@ const Network = (): BarBoxChild => {
             className={componentClassName()}
             onDestroy={() => {
                 iconBinding.drop();
+                networkIcon.drop();
                 networkLabel.drop();
                 componentClassName.drop();
             }}
         >
-            <NetworkIcon />
+            {networkIcon()}
             {networkLabel()}
         </box>
     );

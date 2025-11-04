@@ -1,8 +1,7 @@
 # HyprPanel - Agent Guidelines
 
-## Build & Test Commands
+## Development Commands
 
-- **Build**: `ags bundle --gtk 3 --root . app.ts hyprpanel-app` (or use meson: `meson setup build && meson compile -C build`)
 - **Lint**: `npm run lint` (fix with `npm run lint:fix`)
 - **Format**: `npm run format` (Prettier for .ts files)
 - **Type Check**: `tsc --noEmit`
