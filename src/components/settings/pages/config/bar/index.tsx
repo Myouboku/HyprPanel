@@ -435,6 +435,24 @@ export const BarSettings = (): JSX.Element => {
                 />
                 <Option opt={options.bar.network.truncation_size} title="Truncation Size" type="number" />
                 <Option
+                    opt={options.bar.network.showEthernet}
+                    title="Show Ethernet"
+                    subtitle="Display Ethernet section in network menu"
+                    type="boolean"
+                />
+                <Option
+                    opt={options.bar.network.showWifi}
+                    title="Show WiFi"
+                    subtitle="Display WiFi section in network menu"
+                    type="boolean"
+                />
+                <Option
+                    opt={options.bar.network.showVpn}
+                    title="Show VPN"
+                    subtitle="Display VPN section in network menu"
+                    type="boolean"
+                />
+                <Option
                     opt={options.theme.bar.buttons.network.spacing}
                     title="Inner Spacing"
                     subtitle="Spacing between icon and label."
