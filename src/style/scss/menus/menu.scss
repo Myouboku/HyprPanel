@@ -118,6 +118,10 @@
         margin-top: 0em;
     }
 
+    &:first-child:last-child {
+        margin: 1em 0em;
+    }
+
     &:nth-child(2) {
         margin-top: 1em;
     }

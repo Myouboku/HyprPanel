@@ -12,8 +12,19 @@ import { NetworkService } from 'src/services/network';
 
 const networkService = AstalNetwork.get_default();
 const vpnService = NetworkService.getInstance();
-const { label, truncation, truncation_size, rightClick, middleClick, scrollDown, scrollUp, showWifiInfo } =
-    options.bar.network;
+const {
+    label,
+    truncation,
+    truncation_size,
+    rightClick,
+    middleClick,
+    scrollDown,
+    scrollUp,
+    showWifiInfo,
+    showEthernet,
+    showWifi,
+    showVpn,
+} = options.bar.network;
 
 const Network = (): BarBoxChild => {
     const iconBinding = Variable.derive(
@@ -144,7 +155,9 @@ const Network = (): BarBoxChild => {
 
                         disconnectFunctions.push(
                             onPrimaryClick(self, (clicked, event) => {
-                                openDropdownMenu(clicked, event, 'networkmenu');
+                                if (showEthernet.get() || showWifi.get() || showVpn.get()) {
+                                    openDropdownMenu(clicked, event, 'networkmenu');
+                                }
                             }),
                         );
 
