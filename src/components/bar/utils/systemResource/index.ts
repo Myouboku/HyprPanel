@@ -64,7 +64,7 @@ export const renderResourceLabel = (
         return SizeConverter.fromBytes(free).formatAuto(precision);
     }
 
-    return `${percentage}%`;
+    return `${percentage.toFixed(precision)}%`;
 };
 
 /**
