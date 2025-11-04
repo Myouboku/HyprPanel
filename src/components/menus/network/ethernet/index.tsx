@@ -6,9 +6,13 @@ import { NetworkService } from 'src/services/network';
 
 const networkService = NetworkService.getInstance();
 
-export const Ethernet = (): JSX.Element => {
+export const Ethernet = ({
+    visible,
+}: {
+    visible?: boolean | import('astal').Binding<boolean>;
+}): JSX.Element => {
     return (
-        <box className={'menu-section-container ethernet'} vertical>
+        <box className={'menu-section-container ethernet'} vertical visible={visible}>
             <box className={'menu-label-container'} halign={Gtk.Align.FILL}>
                 <label className={'menu-label'} halign={Gtk.Align.START} hexpand label={'Ethernet'} />
             </box>

@@ -2,9 +2,13 @@ import { Gtk } from 'astal/gtk3';
 import { RefreshButton } from '../Controls/RefreshButton';
 import { WifiSwitch } from '../Controls/WifiSwitch';
 
-export const NoWifi = (): JSX.Element => {
+export const NoWifi = ({
+    visible,
+}: {
+    visible?: boolean | import('astal').Binding<boolean>;
+}): JSX.Element => {
     return (
-        <box className="menu-section-container wifi" vertical>
+        <box className="menu-section-container wifi" vertical visible={visible}>
             <box className="menu-label-container" halign={Gtk.Align.FILL}>
                 <label className="menu-label" halign={Gtk.Align.START} hexpand label="Wi-Fi" />
                 <WifiSwitch />

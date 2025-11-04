@@ -8,11 +8,12 @@ const networkService = NetworkService.getInstance();
 /**
  * Vpn component displays the VPN section in the network menu
  *
+ * @param visible - Optional visibility binding to show/hide the VPN section
  * @returns A JSX element representing the VPN section
  */
-export const Vpn = (): JSX.Element => {
+export const Vpn = ({ visible }: { visible?: boolean | import('astal').Binding<boolean> }): JSX.Element => {
     return (
-        <box className={'menu-section-container vpn'} vertical>
+        <box className={'menu-section-container vpn'} vertical visible={visible}>
             <box className={'menu-label-container'} halign={Gtk.Align.FILL}>
                 <label className={'menu-label'} halign={Gtk.Align.START} hexpand label={'VPN'} />
             </box>
