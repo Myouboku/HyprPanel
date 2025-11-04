@@ -2,6 +2,7 @@ import { bind, Variable } from 'astal';
 import AstalNetwork from 'gi://AstalNetwork?version=0.1';
 import { WifiManager } from './wifi';
 import { EthernetManager } from './ethernet';
+import { VpnManager } from './vpn';
 import { WifiIcon, wifiIconMap } from './types';
 
 /**
@@ -14,11 +15,13 @@ export class NetworkService {
 
     public wifi: WifiManager;
     public ethernet: EthernetManager;
+    public vpn: VpnManager;
 
     private constructor() {
         this._astalNetwork = AstalNetwork.get_default();
         this.wifi = new WifiManager(this._astalNetwork);
         this.ethernet = new EthernetManager(this._astalNetwork);
+        this.vpn = new VpnManager(this._astalNetwork);
 
         this._setupBindings();
     }

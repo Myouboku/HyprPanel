@@ -20,3 +20,8 @@ declare module '*.css' {
     const content: string;
     export default content;
 }
+
+declare module 'gi://NM?version=1.0' {
+    export * from 'gi://NM';
+    export { default } from 'gi://NM';
+}
