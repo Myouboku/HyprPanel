@@ -34,17 +34,32 @@ const Network = (): BarBoxChild => {
         },
     );
 
+    const lastValidIcon = Variable<JSX.Element>(
+        <label className={'bar-button-icon network-icon'} label="󰖂 " />,
+    );
+
     const networkIcon = Variable.derive(
         [bind(vpnService.vpn.activeVpn), bind(iconBinding)],
         (activeVpn, icon) => {
+            let result: JSX.Element | null = null;
+
             if (activeVpn) {
-                return <label className={'bar-button-icon network-icon'} label="󰖂 " />;
+                result = <label className={'bar-button-icon network-icon'} label="󰖂 " />;
+            } else if (icon && icon !== '') {
+                result = <icon className={'bar-button-icon network-icon'} icon={icon} />;
             }
-            if (!icon || icon === '') {
-                return <box />;
+
+            if (result !== null) {
+                lastValidIcon.set(result);
+                return result;
             }
-            return <icon className={'bar-button-icon network-icon'} icon={icon} />;
+
+            return lastValidIcon.get();
         },
+    );
+
+    const lastValidLabel = Variable<JSX.Element>(
+        <label className={'bar-button-label network-label'} label="--" />,
     );
 
     const networkLabel = Variable.derive(
@@ -65,39 +80,39 @@ const Network = (): BarBoxChild => {
                 return <box />;
             }
 
-            // Check if VPN is active first
-            if (activeVpn) {
-                return <label className={'bar-button-label network-label'} label={activeVpn} />;
-            }
+            let result: JSX.Element | null = null;
 
-            if (primaryNetwork === AstalNetwork.Primary.WIRED) {
-                return (
+            if (activeVpn) {
+                result = <label className={'bar-button-label network-label'} label={activeVpn} />;
+            } else if (primaryNetwork === AstalNetwork.Primary.WIRED) {
+                result = (
                     <label className={'bar-button-label network-label'} label={'Wired'.substring(0, tSize)} />
                 );
-            }
-            const networkWifi = networkService.wifi;
-            if (networkWifi !== null) {
-                if (!networkWifi.enabled) {
-                    return <label className={'bar-button-label network-label'} label="Off" />;
+            } else {
+                const networkWifi = networkService.wifi;
+                if (networkWifi !== null) {
+                    if (!networkWifi.enabled) {
+                        result = <label className={'bar-button-label network-label'} label="Off" />;
+                    } else if (networkWifi.active_access_point !== null) {
+                        result = (
+                            <label
+                                className={'bar-button-label network-label'}
+                                label={`${trunc ? networkWifi.ssid.substring(0, tSize) : networkWifi.ssid}`}
+                                tooltipText={showWifiInfo ? formatWifiInfo(networkWifi) : ''}
+                            />
+                        );
+                    } else {
+                        result = <label className={'bar-button-label network-label'} label="--" />;
+                    }
                 }
-
-                return (
-                    <label
-                        className={'bar-button-label network-label'}
-                        label={
-                            networkWifi.active_access_point !== null
-                                ? `${trunc ? networkWifi.ssid.substring(0, tSize) : networkWifi.ssid}`
-                                : '--'
-                        }
-                        tooltipText={
-                            showWifiInfo && networkWifi.active_access_point !== null
-                                ? formatWifiInfo(networkWifi)
-                                : ''
-                        }
-                    />
-                );
             }
-            return <box />;
+
+            if (result !== null) {
+                lastValidLabel.set(result);
+                return result;
+            }
+
+            return lastValidLabel.get();
         },
     );
 
@@ -121,7 +136,9 @@ const Network = (): BarBoxChild => {
             className={componentClassName()}
             onDestroy={() => {
                 iconBinding.drop();
+                lastValidIcon.drop();
                 networkIcon.drop();
+                lastValidLabel.drop();
                 networkLabel.drop();
                 componentClassName.drop();
             }}
