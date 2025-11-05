@@ -287,10 +287,6 @@ export class VpnManager {
             await execAsync(`nmcli connection up "${vpnName}"`);
             await this.refreshVpnConnections();
             this.connecting.set('');
-            SystemUtilities.notify({
-                summary: 'VPN',
-                body: `Connected to ${vpnName}`,
-            });
         } catch (err) {
             this.connecting.set('');
             const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -313,10 +309,6 @@ export class VpnManager {
             await execAsync(`nmcli connection down "${vpnName}"`);
             await this.refreshVpnConnections();
             this.connecting.set('');
-            SystemUtilities.notify({
-                summary: 'VPN',
-                body: `Disconnected from ${vpnName}`,
-            });
         } catch (err) {
             this.connecting.set('');
             const errorMessage = err instanceof Error ? err.message : 'Unknown error';
