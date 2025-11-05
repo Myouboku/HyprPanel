@@ -18,6 +18,7 @@ export interface VpnConnection {
 export class VpnManager {
     private _astalNetwork: AstalNetwork.Network;
     private _nmClient: NM.Client | null = null;
+    private _connectionMonitors: Map<string, number> = new Map();
 
     public vpnConnections: Variable<VpnConnection[]> = Variable([]);
     public activeVpn: Variable<string | undefined> = Variable(undefined);
@@ -39,6 +40,7 @@ export class VpnManager {
         }
 
         this._loadVpnConnections();
+        this._monitorExistingConnections();
 
         this._nmClient.connect('connection-added', () => {
             this._loadVpnConnections();
@@ -48,13 +50,91 @@ export class VpnManager {
             this._loadVpnConnections();
         });
 
-        this._nmClient.connect('active-connection-added', () => {
+        this._nmClient.connect(
+            'active-connection-added',
+            (_client: NM.Client, activeConn: NM.ActiveConnection) => {
+                this._monitorActiveConnection(activeConn);
+                this._updateActiveVpnFromClient();
+            },
+        );
+
+        this._nmClient.connect(
+            'active-connection-removed',
+            (_client: NM.Client, activeConn: NM.ActiveConnection) => {
+                const connPath = activeConn.get_path();
+                const handlerId = this._connectionMonitors.get(connPath);
+                if (handlerId !== undefined) {
+                    activeConn.disconnect(handlerId);
+                    this._connectionMonitors.delete(connPath);
+                }
+                this._updateActiveVpnFromClient();
+            },
+        );
+    }
+
+    /**
+     * Monitors an active connection for state changes
+     *
+     * @param activeConn - The active connection to monitor
+     */
+    private _monitorActiveConnection(activeConn: NM.ActiveConnection): void {
+        if (!(activeConn instanceof NM.VpnConnection)) {
+            return;
+        }
+
+        const connPath = activeConn.get_path();
+
+        // Don't monitor if already monitoring this connection
+        if (this._connectionMonitors.has(connPath)) {
+            return;
+        }
+
+        // Listen for state changes on this connection
+        const handlerId = activeConn.connect('notify::state', () => {
             this._updateActiveVpnFromClient();
+            this._loadVpnConnections();
         });
 
-        this._nmClient.connect('active-connection-removed', () => {
-            this._updateActiveVpnFromClient();
+        this._connectionMonitors.set(connPath, handlerId);
+    }
+
+    /**
+     * Monitors all existing active VPN connections at startup
+     */
+    private _monitorExistingConnections(): void {
+        if (!this._nmClient) {
+            return;
+        }
+
+        const activeConnections = this._nmClient.get_active_connections();
+        for (let i = 0; i < activeConnections.length; i++) {
+            const activeConn = activeConnections[i] as NM.ActiveConnection;
+            this._monitorActiveConnection(activeConn);
+        }
+    }
+
+    /**
+     * Cleans up all connection monitors
+     */
+    private _cleanupConnectionMonitors(): void {
+        if (!this._nmClient) {
+            return;
+        }
+
+        const activeConnections = this._nmClient.get_active_connections();
+
+        this._connectionMonitors.forEach((handlerId, connPath) => {
+            // Find the connection by path
+            for (let i = 0; i < activeConnections.length; i++) {
+                const activeConn = activeConnections[i] as NM.ActiveConnection;
+                if (activeConn.get_path() === connPath) {
+                    activeConn.disconnect(handlerId);
+                    break;
+                }
+            }
         });
+
+        this._connectionMonitors.clear();
     }
 
     /**
@@ -215,6 +295,7 @@ export class VpnManager {
      * Called when the VPN service changes to update bindings
      */
     public onVpnServiceChanged(): void {
+        this._cleanupConnectionMonitors();
         this._nmClient = this._astalNetwork.get_client();
         this._setupBindings();
     }

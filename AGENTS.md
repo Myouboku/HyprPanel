@@ -19,7 +19,7 @@
 - **No Non-Null Assertions**: Avoid `!` operator (`@typescript-eslint/no-non-null-assertion: error`)
 - **Naming**: PascalCase for types/classes, UPPER*CASE for enum members, private members require `*` prefix
 - **Member Access**: Explicit accessibility modifiers required (public/private/protected), except constructors
-- **Comments**: JSDoc for public methods explaining purpose and parameters
+- **Comments**: JSDoc for public methods explaining purpose and parameters. Avoid unnecessary comments that restate obvious code behavior
 
 ## Architecture
 
