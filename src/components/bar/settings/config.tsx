@@ -174,6 +174,83 @@ export const CustomModuleSettings = (): JSX.Element => {
                     type="string"
                 />
 
+                {/* GPU Section */}
+                <Header title="GPU" />
+                <Option
+                    opt={options.theme.bar.buttons.modules.gpu.enableBorder}
+                    title="Button Border"
+                    type="boolean"
+                />
+                <Option opt={options.bar.customModules.gpu.icon} title="GPU Icon" type="string" />
+                <Option opt={options.bar.customModules.gpu.label} title="Show Label" type="boolean" />
+                <Option opt={options.theme.bar.buttons.modules.gpu.spacing} title="Spacing" type="string" />
+                <Option opt={options.bar.customModules.gpu.round} title="Round" type="boolean" />
+                <Option
+                    opt={options.bar.customModules.gpu.pollingInterval}
+                    title="Polling Interval"
+                    type="number"
+                    min={100}
+                    max={60 * 24 * 1000}
+                    increment={1000}
+                />
+                <Option opt={options.bar.customModules.gpu.leftClick} title="Left Click" type="string" />
+                <Option opt={options.bar.customModules.gpu.rightClick} title="Right Click" type="string" />
+                <Option opt={options.bar.customModules.gpu.middleClick} title="Middle Click" type="string" />
+                <Option opt={options.bar.customModules.gpu.scrollUp} title="Scroll Up" type="string" />
+                <Option opt={options.bar.customModules.gpu.scrollDown} title="Scroll Down" type="string" />
+
+                {/* GPU Temperature Section */}
+                <Header title="GPU Temperature" />
+                <Option
+                    opt={options.theme.bar.buttons.modules.gpuTemp.enableBorder}
+                    title="Button Border"
+                    type="boolean"
+                />
+                <Option
+                    opt={options.bar.customModules.gpuTemp.unit}
+                    title="GPU Temperature Unit"
+                    type="enum"
+                    enums={['imperial', 'metric']}
+                />
+                <Option opt={options.bar.customModules.gpuTemp.showUnit} title="Show Unit" type="boolean" />
+                <Option
+                    opt={options.bar.customModules.gpuTemp.icon}
+                    title="GPU Temperature Icon"
+                    type="string"
+                />
+                <Option opt={options.bar.customModules.gpuTemp.label} title="Show Label" type="boolean" />
+                <Option
+                    opt={options.theme.bar.buttons.modules.gpuTemp.spacing}
+                    title="Spacing"
+                    type="string"
+                />
+                <Option opt={options.bar.customModules.gpuTemp.round} title="Round" type="boolean" />
+                <Option
+                    opt={options.bar.customModules.gpuTemp.pollingInterval}
+                    title="Polling Interval"
+                    type="number"
+                    min={100}
+                    max={60 * 24 * 1000}
+                    increment={1000}
+                />
+                <Option opt={options.bar.customModules.gpuTemp.leftClick} title="Left Click" type="string" />
+                <Option
+                    opt={options.bar.customModules.gpuTemp.rightClick}
+                    title="Right Click"
+                    type="string"
+                />
+                <Option
+                    opt={options.bar.customModules.gpuTemp.middleClick}
+                    title="Middle Click"
+                    type="string"
+                />
+                <Option opt={options.bar.customModules.gpuTemp.scrollUp} title="Scroll Up" type="string" />
+                <Option
+                    opt={options.bar.customModules.gpuTemp.scrollDown}
+                    title="Scroll Down"
+                    type="string"
+                />
+
                 {/* Storage Section */}
                 <Header title="Storage" />
                 <Option
