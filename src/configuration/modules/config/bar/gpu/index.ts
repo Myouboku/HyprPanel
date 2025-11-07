@@ -1,7 +1,7 @@
 import { opt } from 'src/lib/options';
 
 export default {
-    icon: opt('󰾲'),
+    icon: opt(''),
     label: opt(true),
     round: opt(true),
     pollingInterval: opt(2000),

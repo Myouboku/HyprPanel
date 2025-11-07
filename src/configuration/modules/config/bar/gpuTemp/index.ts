@@ -2,7 +2,7 @@ import { opt } from 'src/lib/options';
 import { UnitType } from 'src/lib/units/temperature/types';
 
 export default {
-    icon: opt('󰾲'),
+    icon: opt(''),
     label: opt(true),
     round: opt(true),
     showUnit: opt(true),
