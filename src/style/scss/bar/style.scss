@@ -217,6 +217,44 @@ $style-module-defaults: (
 
 /*
  * #################################
+ * #    GPU Module Styling         #
+ * #################################
+ */
+@include styleModule(
+    'gpu',
+    (
+        'text-color': $bar-buttons-modules-gpu-text,
+        'icon-color': $bar-buttons-modules-gpu-icon,
+        'icon-background': $bar-buttons-modules-gpu-icon_background,
+        'label-background': $bar-buttons-modules-gpu-background,
+        'inner-spacing': $bar-buttons-modules-gpu-spacing,
+        'border-enabled': $bar-buttons-modules-gpu-enableBorder,
+        'border-color': $bar-buttons-modules-gpu-border,
+        'icon-size': 1.05em,
+    )
+);
+
+/*
+ * #################################
+ * #    GPU Temp Module Styling    #
+ * #################################
+ */
+@include styleModule(
+    'gpu-temp',
+    (
+        'text-color': $bar-buttons-modules-gpuTemp-text,
+        'icon-color': $bar-buttons-modules-gpuTemp-icon,
+        'icon-background': $bar-buttons-modules-gpuTemp-icon_background,
+        'label-background': $bar-buttons-modules-gpuTemp-background,
+        'inner-spacing': $bar-buttons-modules-gpuTemp-spacing,
+        'border-enabled': $bar-buttons-modules-gpuTemp-enableBorder,
+        'border-color': $bar-buttons-modules-gpuTemp-border,
+        'icon-size': 1.05em,
+    )
+);
+
+/*
+ * #################################
  * #    Storage Module Styling     #
  * #################################
  */
