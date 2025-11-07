@@ -6,6 +6,8 @@ import cava from './cava';
 import clock from './clock';
 import cpu from './cpu';
 import cpuTemp from './cpuTemp';
+import gpu from './gpu';
+import gpuTemp from './gpuTemp';
 import hypridle from './hypridle';
 import hyprsunset from './hyprsunset';
 import kbLayout from './kbLayout';
@@ -49,6 +51,8 @@ export default {
         ram,
         cpu,
         cpuTemp,
+        gpu,
+        gpuTemp,
         storage,
         netstat,
         kbLayout,

@@ -1,20 +1,25 @@
 import { bind, exec, Variable } from 'astal';
+import GLib from 'gi://GLib?version=2.0';
 import { FunctionPoller } from 'src/lib/poller/FunctionPoller';
-import { GpuServiceCtor, GPUStat } from './types';
+import { GpuServiceCtor, GPUStat, GpuType } from './types';
 
 /**
- * Service for monitoring GPU usage percentage using gpustat
+ * Service for monitoring GPU usage percentage
+ * Supports both AMD (via sysfs) and NVIDIA (via gpustat) GPUs
  */
 class GpuUsageService {
     private _updateFrequency: Variable<number>;
     private _gpuPoller: FunctionPoller<number, []>;
     private _isInitialized = false;
+    private _gpuType: GpuType = 'unknown';
+    private _amdGpuPath?: string;
 
     public _gpu = Variable<number>(0);
 
     constructor({ frequency }: GpuServiceCtor = {}) {
         this._updateFrequency = frequency ?? Variable(2000);
         this._calculateUsage = this._calculateUsage.bind(this);
+        this._detectGpuType();
 
         this._gpuPoller = new FunctionPoller<number, []>(
             this._gpu,
@@ -22,6 +27,67 @@ class GpuUsageService {
             bind(this._updateFrequency),
             this._calculateUsage,
         );
+    }
+
+    /**
+     * Detects the GPU type (AMD or NVIDIA) and sets up appropriate paths
+     */
+    private _detectGpuType(): void {
+        const amdPath = this._findAmdGpuPath();
+        if (amdPath) {
+            this._gpuType = 'amd';
+            this._amdGpuPath = amdPath;
+            return;
+        }
+
+        try {
+            const gpuStats = exec('gpustat --json');
+            if (typeof gpuStats === 'string') {
+                this._gpuType = 'nvidia';
+                return;
+            }
+        } catch {
+            console.debug('gpustat not available, GPU type remains unknown');
+        }
+
+        this._gpuType = 'unknown';
+    }
+
+    /**
+     * Finds the AMD GPU busy percent file path
+     *
+     * @returns Path to gpu_busy_percent file or undefined if not found
+     */
+    private _findAmdGpuPath(): string | undefined {
+        const drmPath = '/sys/class/drm';
+
+        try {
+            const dir = GLib.Dir.open(drmPath, 0);
+            let dirname: string | null;
+
+            while ((dirname = dir.read_name()) !== null) {
+                if (!dirname.startsWith('card')) continue;
+                if (dirname.includes('-')) continue;
+
+                const busyPath = `${drmPath}/${dirname}/device/gpu_busy_percent`;
+
+                try {
+                    const [success] = GLib.file_get_contents(busyPath);
+                    if (success) {
+                        dir.close();
+                        return busyPath;
+                    }
+                } catch {
+                    continue;
+                }
+            }
+
+            dir.close();
+        } catch (error) {
+            console.debug('Error scanning DRM devices:', error);
+        }
+
+        return undefined;
     }
 
     /**
@@ -41,11 +107,61 @@ class GpuUsageService {
     }
 
     /**
-     * Calculates average GPU usage across all available GPUs
+     * Gets the detected GPU type
+     *
+     * @returns The GPU type (amd, nvidia, or unknown)
+     */
+    public get gpuType(): GpuType {
+        return this._gpuType;
+    }
+
+    /**
+     * Calculates GPU usage based on detected GPU type
      *
      * @returns GPU usage as a decimal between 0 and 1
      */
     private _calculateUsage(): number {
+        if (this._gpuType === 'amd') {
+            return this._calculateAmdUsage();
+        }
+
+        if (this._gpuType === 'nvidia') {
+            return this._calculateNvidiaUsage();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Reads GPU usage from AMD sysfs interface
+     *
+     * @returns GPU usage as a decimal between 0 and 1
+     */
+    private _calculateAmdUsage(): number {
+        if (!this._amdGpuPath) return 0;
+
+        try {
+            const [success, bytes] = GLib.file_get_contents(this._amdGpuPath);
+            if (!success || !bytes) return 0;
+
+            const content = new TextDecoder('utf-8').decode(bytes);
+            const usage = parseInt(content.trim(), 10);
+
+            if (isNaN(usage)) return 0;
+
+            return usage / 100;
+        } catch (error) {
+            console.error('Error reading AMD GPU usage:', error);
+            return 0;
+        }
+    }
+
+    /**
+     * Calculates GPU usage for NVIDIA cards using gpustat
+     *
+     * @returns GPU usage as a decimal between 0 and 1
+     */
+    private _calculateNvidiaUsage(): number {
         try {
             const gpuStats = exec('gpustat --json');
             if (typeof gpuStats !== 'string') {

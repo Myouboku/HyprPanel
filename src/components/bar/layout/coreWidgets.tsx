@@ -4,6 +4,8 @@ import { Cava } from '../modules/cava';
 import { Clock } from '../modules/clock';
 import { Cpu } from '../modules/cpu';
 import { CpuTemp } from '../modules/cputemp';
+import { Gpu } from '../modules/gpu';
+import { GpuTemp } from '../modules/gputemp';
 import { Hypridle } from '../modules/hypridle';
 import { Hyprsunset } from '../modules/hyprsunset';
 import { KbInput } from '../modules/kblayout';
@@ -45,6 +47,8 @@ export function getCoreWidgets(): Record<string, WidgetFactory> {
         ram: () => WidgetContainer(Ram()),
         cpu: () => WidgetContainer(Cpu()),
         cputemp: () => WidgetContainer(CpuTemp()),
+        gpu: () => WidgetContainer(Gpu()),
+        gputemp: () => WidgetContainer(GpuTemp()),
         storage: () => WidgetContainer(Storage()),
         netstat: () => WidgetContainer(Netstat()),
         kbinput: () => WidgetContainer(KbInput()),

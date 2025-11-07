@@ -26,6 +26,8 @@ import netstat from './netstat';
 import storage from './storage';
 import cpuTemp from './cpuTemp';
 import cpu from './cpu';
+import gpu from './gpu';
+import gpuTemp from './gpuTemp';
 import ram from './ram';
 import microphone from './microphone';
 
@@ -66,6 +68,8 @@ export default {
         ram: ram,
         cpu: cpu,
         cpuTemp: cpuTemp,
+        gpu: gpu,
+        gpuTemp: gpuTemp,
         storage: storage,
         netstat: netstat,
         kbLayout: kbLayout,

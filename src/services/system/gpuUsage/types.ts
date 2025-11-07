@@ -4,6 +4,8 @@ export interface GpuServiceCtor {
     frequency?: Variable<number>;
 }
 
+export type GpuType = 'amd' | 'nvidia' | 'unknown';
+
 export type GPUStat = {
     index: number;
     uuid: string;
