@@ -51,6 +51,8 @@ export class MediaPlayerService {
         artUrl: undefined,
     };
 
+    private _playerListeners: Map<string, number> = new Map();
+
     private constructor() {
         this._mprisService = AstalMpris.get_default();
         const { noMediaText } = options.menus.media;
@@ -84,6 +86,7 @@ export class MediaPlayerService {
      * Handles a new player being added
      *
      * Sets the new player as active if no player is currently active.
+     * Also sets up a listener to track playback status changes.
      *
      * @param addedPlayer The player that was added
      */
@@ -91,6 +94,12 @@ export class MediaPlayerService {
         if (this.activePlayer.get() === undefined) {
             this.activePlayer.set(addedPlayer);
         }
+
+        const listenerId = addedPlayer.connect('notify::playback-status', () => {
+            this._onPlayerPlaybackChanged(addedPlayer);
+        });
+
+        this._playerListeners.set(addedPlayer.busName, listenerId);
     }
 
     /**
@@ -102,6 +111,12 @@ export class MediaPlayerService {
      * @param closedPlayer The player that was closed
      */
     private _handlePlayerClosed(closedPlayer: AstalMpris.Player): void {
+        const listenerId = this._playerListeners.get(closedPlayer.busName);
+        if (listenerId !== undefined) {
+            closedPlayer.disconnect(listenerId);
+            this._playerListeners.delete(closedPlayer.busName);
+        }
+
         if (
             this._mprisService.get_players().length === 1 &&
             closedPlayer.busName === this._mprisService.get_players()[0]?.busName
@@ -114,6 +129,44 @@ export class MediaPlayerService {
                 .get_players()
                 .find((player) => player.busName !== closedPlayer.busName);
             this.activePlayer.set(nextPlayer);
+        }
+    }
+
+    /**
+     * Handles playback status changes for any player
+     *
+     * Automatically switches to a player when it starts playing,
+     * or switches away from a player when it stops/pauses if another is playing.
+     *
+     * @param player The player whose playback status changed
+     */
+    private _onPlayerPlaybackChanged(player: AstalMpris.Player): void {
+        const currentPlayer = this.activePlayer.get();
+
+        if (
+            player.playbackStatus === AstalMpris.PlaybackStatus.PLAYING &&
+            currentPlayer?.busName !== player.busName
+        ) {
+            this.activePlayer.set(player);
+            return;
+        }
+
+        if (
+            currentPlayer?.busName === player.busName &&
+            (player.playbackStatus === AstalMpris.PlaybackStatus.PAUSED ||
+                player.playbackStatus === AstalMpris.PlaybackStatus.STOPPED)
+        ) {
+            const playingPlayer = this._mprisService
+                .get_players()
+                .find(
+                    (p) =>
+                        p.busName !== player.busName &&
+                        p.playbackStatus === AstalMpris.PlaybackStatus.PLAYING,
+                );
+
+            if (playingPlayer) {
+                this.activePlayer.set(playingPlayer);
+            }
         }
     }
 
@@ -489,6 +542,14 @@ export class MediaPlayerService {
      * to prevent memory leaks.
      */
     public dispose(): void {
+        for (const [busName, listenerId] of this._playerListeners.entries()) {
+            const player = this._mprisService.get_players().find((p) => p.busName === busName);
+            if (player) {
+                player.disconnect(listenerId);
+            }
+        }
+        this._playerListeners.clear();
+
         Object.values(this._subscriptions).forEach((sub) => sub?.drop());
 
         this.activePlayer.drop();
