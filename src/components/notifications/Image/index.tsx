@@ -2,15 +2,19 @@ import AstalNotifd from 'gi://AstalNotifd?version=0.1';
 import { Gtk } from 'astal/gtk3';
 import { isAnImage } from 'src/lib/validation/images';
 import { notifHasImg } from '../helpers';
+import { getNotificationIcon } from 'src/lib/shared/notifications';
 
 const ImageItem = ({ notification }: ImageProps): JSX.Element => {
+    const { appName, appIcon, desktopEntry } = notification;
+    const resolvedIcon = getNotificationIcon(appName, appIcon, desktopEntry);
+
     if (notification.appIcon && !isAnImage(notification.appIcon)) {
         return (
             <icon
                 className={'notification-card-image icon'}
                 halign={Gtk.Align.CENTER}
                 vexpand={false}
-                icon={notification.appIcon}
+                icon={resolvedIcon}
             />
         );
     }

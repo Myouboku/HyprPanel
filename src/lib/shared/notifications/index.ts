@@ -35,20 +35,27 @@ export const filterNotifications = (
 export const getNotificationIcon = (app_name: string, app_icon: string, app_entry: string): string => {
     const icon = icons.fallback.notification;
 
-    if (iconExists(app_name)) {
-        return app_name;
-    } else if (app_name && iconExists(app_name.toLowerCase())) {
-        return app_name.toLowerCase();
-    }
-
-    if (app_icon && iconExists(app_icon)) {
-        return app_icon;
-    }
-
+    // Priority 1: app_entry (most reliable for Flatpak apps with reverse-DNS naming)
     if (app_entry && iconExists(app_entry)) {
         return app_entry;
     }
 
+    // Priority 2: app_icon
+    if (app_icon && iconExists(app_icon)) {
+        return app_icon;
+    }
+
+    // Priority 3: app_name
+    if (iconExists(app_name)) {
+        return app_name;
+    }
+
+    // Priority 4: app_name.toLowerCase()
+    if (app_name && iconExists(app_name.toLowerCase())) {
+        return app_name.toLowerCase();
+    }
+
+    // Fallback to default notification icon
     return icon;
 };
 
