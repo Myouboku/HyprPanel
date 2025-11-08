@@ -28,3 +28,9 @@
 - **State**: Astal `Variable` for reactive state, `bind()` for reactive bindings
 - **Components**: Functional TSX components returning `JSX.Element`
 - **Error Handling**: Use `errorHandler` from `src/core/errors/handler`
+
+## Documentation & Help
+
+- **Context7**: When uncertain about how to use Astal, GTK3 components, or other dependencies, use the `context7` tool to fetch up-to-date documentation
+- **Libraries to query**: `astal`, `gtk3`, or any other library mentioned in the codebase
+- **When to use**: Before implementing unfamiliar APIs, patterns, or when encountering errors with external dependencies
