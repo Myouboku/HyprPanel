@@ -16,6 +16,19 @@ export const NotificationSettings = (): JSX.Element => {
                     type="object"
                 />
                 <Option
+                    opt={options.notifications.playSound}
+                    title="Play Sound"
+                    subtitle="Play a sound when receiving notifications"
+                    type="boolean"
+                />
+                <Option
+                    opt={options.notifications.soundName}
+                    title="Notification Sound"
+                    subtitle="Choose the sound to play for notifications"
+                    type="enum"
+                    enums={['message-new-instant', 'message', 'dialog-information', 'bell', 'complete']}
+                />
+                <Option
                     opt={options.notifications.position}
                     title="Notification Location"
                     type="enum"

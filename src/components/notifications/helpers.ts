@@ -4,11 +4,13 @@ import options from 'src/configuration';
 import { isNotificationIgnored } from 'src/lib/shared/notifications';
 import AstalHyprland from 'gi://AstalHyprland?version=0.1';
 import GLib from 'gi://GLib';
+import { NotificationSoundService } from 'src/services/system/notification-sound';
 
 const notifdService = AstalNotifd.get_default();
 const hyprlandService = AstalHyprland.get_default();
+const soundService = NotificationSoundService.getInstance();
 
-const { ignore, timeout: popupTimeout, autoDismiss } = options.notifications;
+const { ignore, timeout: popupTimeout, autoDismiss, playSound, soundName } = options.notifications;
 
 /**
  * Checks if a notification has an image.
@@ -60,6 +62,10 @@ export const trackPopupNotifications = (popupNotifications: Variable<AstalNotifd
 
         if (doNotDisturb) {
             return;
+        }
+
+        if (playSound.get()) {
+            soundService.playNotificationSound(soundName.get());
         }
 
         popupNotifications.set([...popupNotifications.get(), notification]);
