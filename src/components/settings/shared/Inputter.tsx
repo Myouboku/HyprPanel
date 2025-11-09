@@ -8,6 +8,7 @@ import { WallpaperInputter } from './inputs/wallpaper';
 import { ColorInputter } from './inputs/color';
 import { EnumInputter } from './inputs/enum';
 import { FontInputter } from './inputs/font';
+import { AudioFileInputter } from './inputs/audiofile';
 import { Variable } from 'astal';
 import { Gtk } from 'astal/gtk3';
 import { RowProps } from 'src/lib/options/types';
@@ -47,6 +48,8 @@ const InputField = <T extends string | number | boolean | object>({
             );
         case 'img':
             return <ImageInputter opt={opt} />;
+        case 'audiofile':
+            return <AudioFileInputter opt={opt} />;
         case 'config_import':
             return <ImportInputter exportData={exportData} />;
         case 'wallpaper':

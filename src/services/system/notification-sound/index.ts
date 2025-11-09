@@ -1,8 +1,9 @@
 import { execAsync } from 'astal';
 
 /**
- * Service for playing notification sounds using libcanberra-gtk.
- * Uses canberra-gtk-play which is compatible with both PipeWire and PulseAudio.
+ * Service for playing notification sounds.
+ * Uses canberra-gtk-play for system sound IDs and pw-play for custom audio files.
+ * This ensures maximum compatibility: system sounds respect the theme, and custom files support all audio formats.
  */
 export class NotificationSoundService {
     private static instance: NotificationSoundService;
@@ -22,14 +23,26 @@ export class NotificationSoundService {
     }
 
     /**
-     * Plays a notification sound using canberra-gtk-play
+     * Plays a notification sound using the appropriate audio backend
      *
-     * @param soundId - The sound event ID (e.g., 'message-new-instant', 'bell')
+     * @param soundIdOrPath - The sound event ID (e.g., 'message-new-instant', 'bell')
+     * or a file path to a custom audio file
      * Defaults to 'message-new-instant' if not specified
+     *
+     * Uses canberra-gtk-play for system sound IDs (respects theme)
+     * Uses pw-play for custom file paths (supports all audio formats: MP3, FLAC, WAV, OGG, etc.)
      */
-    public playNotificationSound(soundId: string = 'message-new-instant'): void {
-        execAsync(['canberra-gtk-play', '-i', soundId]).catch((error) => {
-            console.warn(`Failed to play notification sound '${soundId}':`, error);
-        });
+    public playNotificationSound(soundIdOrPath: string = 'message-new-instant'): void {
+        const isFilePath = soundIdOrPath.includes('/') || soundIdOrPath.startsWith('~');
+
+        if (isFilePath) {
+            execAsync(['pw-play', soundIdOrPath]).catch((error) => {
+                console.warn(`Failed to play notification sound from file '${soundIdOrPath}':`, error);
+            });
+        } else {
+            execAsync(['canberra-gtk-play', '-i', soundIdOrPath]).catch((error) => {
+                console.warn(`Failed to play notification sound '${soundIdOrPath}':`, error);
+            });
+        }
     }
 }

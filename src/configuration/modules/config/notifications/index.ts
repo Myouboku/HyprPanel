@@ -14,4 +14,5 @@ export default {
     clearDelay: opt(100),
     playSound: opt(true),
     soundName: opt('message-new-instant'),
+    customSoundPath: opt(''),
 };

@@ -86,6 +86,7 @@ type InputType =
     | 'enum'
     | 'boolean'
     | 'img'
+    | 'audiofile'
     | 'wallpaper'
     | 'export'
     | 'import'

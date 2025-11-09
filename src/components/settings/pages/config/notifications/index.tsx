@@ -2,6 +2,7 @@ import { Option } from 'src/components/settings/shared/Option';
 import { Header } from 'src/components/settings/shared/Header';
 import options from 'src/configuration';
 import { Gtk } from 'astal/gtk3';
+import { bind } from 'astal';
 
 export const NotificationSettings = (): JSX.Element => {
     return (
@@ -26,8 +27,27 @@ export const NotificationSettings = (): JSX.Element => {
                     title="Notification Sound"
                     subtitle="Choose the sound to play for notifications"
                     type="enum"
-                    enums={['message-new-instant', 'message', 'dialog-information', 'bell', 'complete']}
+                    enums={[
+                        'message-new-instant',
+                        'message',
+                        'dialog-information',
+                        'bell',
+                        'complete',
+                        'custom',
+                    ]}
                 />
+                {bind(options.notifications.soundName).as((soundName) =>
+                    soundName === 'custom' ? (
+                        <Option
+                            opt={options.notifications.customSoundPath}
+                            title="Custom Sound File"
+                            subtitle="Select an audio file for notifications"
+                            type="audiofile"
+                        />
+                    ) : (
+                        <box />
+                    ),
+                )}
                 <Option
                     opt={options.notifications.position}
                     title="Notification Location"
