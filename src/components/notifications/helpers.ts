@@ -10,7 +10,14 @@ const notifdService = AstalNotifd.get_default();
 const hyprlandService = AstalHyprland.get_default();
 const soundService = NotificationSoundService.getInstance();
 
-const { ignore, timeout: popupTimeout, autoDismiss, playSound, soundName } = options.notifications;
+const {
+    ignore,
+    timeout: popupTimeout,
+    autoDismiss,
+    playSound,
+    soundName,
+    customSoundPath,
+} = options.notifications;
 
 /**
  * Checks if a notification has an image.
@@ -65,7 +72,8 @@ export const trackPopupNotifications = (popupNotifications: Variable<AstalNotifd
         }
 
         if (playSound.get()) {
-            soundService.playNotificationSound(soundName.get());
+            const sound = soundName.get() === 'custom' ? customSoundPath.get() : soundName.get();
+            soundService.playNotificationSound(sound);
         }
 
         popupNotifications.set([...popupNotifications.get(), notification]);
