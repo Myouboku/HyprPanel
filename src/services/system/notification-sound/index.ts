@@ -6,7 +6,7 @@ import { execAsync } from 'astal';
  * This ensures maximum compatibility: system sounds respect the theme, and custom files support all audio formats.
  */
 export class NotificationSoundService {
-    private static instance: NotificationSoundService;
+    private static _instance: NotificationSoundService;
 
     private constructor() {}
 
@@ -16,10 +16,10 @@ export class NotificationSoundService {
      * @returns The NotificationSoundService instance
      */
     public static getInstance(): NotificationSoundService {
-        if (!NotificationSoundService.instance) {
-            NotificationSoundService.instance = new NotificationSoundService();
+        if (!NotificationSoundService._instance) {
+            NotificationSoundService._instance = new NotificationSoundService();
         }
-        return NotificationSoundService.instance;
+        return NotificationSoundService._instance;
     }
 
     /**
