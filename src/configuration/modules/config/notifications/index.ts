@@ -15,4 +15,5 @@ export default {
     playSound: opt(true),
     soundName: opt('message-new-instant'),
     customSoundPath: opt(''),
+    suppressOnFullscreen: opt(true),
 };

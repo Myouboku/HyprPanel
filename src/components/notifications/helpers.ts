@@ -17,7 +17,19 @@ const {
     playSound,
     soundName,
     customSoundPath,
+    suppressOnFullscreen,
 } = options.notifications;
+
+/**
+ * Checks if the currently focused Hyprland client is in fullscreen mode.
+ *
+ * @returns True if the focused client is fullscreen, false otherwise.
+ */
+const isFullscreen = (): boolean => {
+    const focusedClient = hyprlandService.focusedClient;
+    // fullscreen: 0 = none, 1 = fullscreen, 2 = fullscreen maximized
+    return (focusedClient?.fullscreen ?? 0) > 0;
+};
 
 /**
  * Checks if a notification has an image.
@@ -68,6 +80,10 @@ export const trackPopupNotifications = (popupNotifications: Variable<AstalNotifd
         }
 
         if (doNotDisturb) {
+            return;
+        }
+
+        if (suppressOnFullscreen.get() && isFullscreen()) {
             return;
         }
 

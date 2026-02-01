@@ -119,6 +119,12 @@ export const NotificationSettings = (): JSX.Element => {
                     subtitle="Persist action buttons after reboot."
                     type="boolean"
                 />
+                <Option
+                    opt={options.notifications.suppressOnFullscreen}
+                    title="Suppress When Fullscreen"
+                    subtitle="Hide popup notifications when a window is fullscreen."
+                    type="boolean"
+                />
 
                 <Header title="Notification Menu Settings" />
                 <Option
