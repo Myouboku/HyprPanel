@@ -19,20 +19,27 @@ const Bluetooth = (): BarBoxChild => {
         <label className={'bar-button-icon bluetooth txt-icon bar'} label={isPowered ? '󰂯' : '󰂲'} />
     );
 
-    const BluetoothLabel = ({ isPowered, devices }: BluetoothLabelProps): JSX.Element => {
+    const BluetoothLabel = ({
+        isPowered,
+        devices,
+        showDeviceNameWhenSingle,
+    }: BluetoothLabelProps): JSX.Element => {
         const connectDevices = devices.filter((device) => device.connected);
 
         let label = '';
 
         if (btStatus === 'MISSING') {
             label = 'Unavailable';
+        } else if (isPowered && connectDevices.length) {
+            if (showDeviceNameWhenSingle && connectDevices.length === 1) {
+                label = ` ${connectDevices[0].name}`;
+            } else {
+                label = ` Connected (${connectDevices.length})`;
+            }
+        } else if (isPowered) {
+            label = 'On';
         } else {
-            label =
-                isPowered && connectDevices.length
-                    ? ` Connected (${connectDevices.length})`
-                    : isPowered
-                      ? 'On'
-                      : 'Off';
+            label = 'Off';
         }
 
         return <label label={label} className={'bar-button-label bluetooth'} />;
@@ -54,17 +61,27 @@ const Bluetooth = (): BarBoxChild => {
     const componentBinding = Variable.derive(
         [
             bind(options.bar.bluetooth.label),
+            bind(options.bar.bluetooth.showDeviceNameWhenSingle),
             bind(bluetoothService, 'isPowered'),
             bind(bluetoothService, 'devices'),
 
             bind(bluetoothService, 'isConnected'),
         ],
-        (showLabel: boolean, isPowered: boolean, devices: AstalBluetooth.Device[]): JSX.Element => {
+        (
+            showLabel: boolean,
+            showDeviceNameWhenSingle: boolean,
+            isPowered: boolean,
+            devices: AstalBluetooth.Device[],
+        ): JSX.Element => {
             if (showLabel) {
                 return (
                     <box>
                         <BluetoothIcon isPowered={isPowered} />
-                        <BluetoothLabel isPowered={isPowered} devices={devices} />
+                        <BluetoothLabel
+                            isPowered={isPowered}
+                            devices={devices}
+                            showDeviceNameWhenSingle={showDeviceNameWhenSingle}
+                        />
                     </box>
                 );
             }
@@ -136,6 +153,7 @@ interface BluetoothIconProps {
 interface BluetoothLabelProps {
     isPowered: boolean;
     devices: AstalBluetooth.Device[];
+    showDeviceNameWhenSingle: boolean;
 }
 
 export { Bluetooth };

@@ -472,6 +472,12 @@ export const BarSettings = (): JSX.Element => {
                 />
                 <Option opt={options.bar.bluetooth.label} title="Show Bluetooth Label" type="boolean" />
                 <Option
+                    opt={options.bar.bluetooth.showDeviceNameWhenSingle}
+                    title="Show Device Name When Single"
+                    subtitle="Display device name instead of 'Connected (1)' when only one device is connected"
+                    type="boolean"
+                />
+                <Option
                     opt={options.theme.bar.buttons.bluetooth.spacing}
                     title="Inner Spacing"
                     subtitle="Spacing between icon and label."
