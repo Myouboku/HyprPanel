@@ -14,7 +14,7 @@ const LastPage = Variable<SettingsPage>('Configuration');
 
 export const PageContainer = (): JSX.Element => {
     return (
-        <box className={'settings-page-container'} halign={Gtk.Align.FILL} vertical>
+        <box className={'settings-page-container'} halign={Gtk.Align.FILL} vertical vexpand>
             <box className={'settings-page-container2'} halign={Gtk.Align.FILL} hexpand>
                 <box className="option-pages-container" halign={Gtk.Align.CENTER} hexpand>
                     {settingsPages.map((page) => {
@@ -41,7 +41,7 @@ export const PageContainer = (): JSX.Element => {
                 transitionType={bind(transition).as((transitionType) => StackTransitionMap[transitionType])}
                 transitionDuration={bind(transitionTime)}
                 shown={bind(CurrentPage)}
-                vexpand={false}
+                vexpand
                 hexpand
             >
                 <SettingsMenu />

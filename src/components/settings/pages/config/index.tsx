@@ -22,7 +22,7 @@ const CurrentPage = Variable<ConfigPage>('General');
 // TODO: Rework the settings menu, it's shit
 export const SettingsMenu = (): JSX.Element => {
     return (
-        <box name={'Configuration'} halign={Gtk.Align.FILL} hexpand vertical>
+        <box name={'Configuration'} halign={Gtk.Align.FILL} hexpand vertical vexpand>
             <box className="option-pages-container" halign={Gtk.Align.CENTER} hexpand vertical>
                 {[0, 1, 2].map((section) => {
                     return (

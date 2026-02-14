@@ -27,7 +27,7 @@ const CurrentPage = Variable<ThemePage>('General Settings');
 
 export const ThemesMenu = (): JSX.Element => {
     return (
-        <box name={'Theming'} halign={Gtk.Align.FILL} hexpand vertical>
+        <box name={'Theming'} halign={Gtk.Align.FILL} hexpand vertical vexpand>
             <box className="option-pages-container" halign={Gtk.Align.CENTER} hexpand vertical>
                 {[0, 1, 2].map((section) => {
                     return (
@@ -61,7 +61,7 @@ export const ThemesMenu = (): JSX.Element => {
                 transitionType={bind(transition).as((transitionType) => StackTransitionMap[transitionType])}
                 transitionDuration={bind(transitionTime)}
                 shown={bind(CurrentPage)}
-                vexpand={false}
+                vexpand
             >
                 <MenuTheme />
                 <Matugen />
