@@ -6,8 +6,16 @@ import options from 'src/configuration';
 import { isPrimaryClick, isSecondaryClick, isMiddleClick } from 'src/lib/events/mouse';
 import { SystemUtilities } from 'src/core/system/SystemUtilities';
 
-const systemtray = AstalTray.get_default();
+let systemTrayInstance: AstalTray.Tray | null = null;
 const { ignore, customIcons } = options.bar.systray;
+
+const getSystemTray = (): AstalTray.Tray => {
+    if (systemTrayInstance === null) {
+        systemTrayInstance = AstalTray.get_default();
+    }
+
+    return systemTrayInstance;
+};
 
 const createMenu = (menuModel: Gio.MenuModel, actionGroup: Gio.ActionGroup | null): Gtk.Menu => {
     const menu = Gtk.Menu.new_from_model(menuModel);
@@ -81,6 +89,7 @@ const MenuEntry = ({ item, child }: MenuEntryProps): JSX.Element => {
 };
 
 const SysTray = (): BarBoxChild => {
+    const systemtray = getSystemTray();
     const isVis = Variable(false);
 
     const componentChildren = Variable.derive(
