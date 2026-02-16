@@ -9,6 +9,7 @@ import { NotificationSoundService } from 'src/services/system/notification-sound
 const notifdService = AstalNotifd.get_default();
 const hyprlandService = AstalHyprland.get_default();
 const soundService = NotificationSoundService.getInstance();
+let didWarnNoFocusedMonitor = false;
 
 const {
     ignore,
@@ -53,9 +54,16 @@ export const notifHasImg = (notification: AstalNotifd.Notification): boolean => 
 export const trackActiveMonitor = (curMonitor: Variable<number>): void => {
     Variable.derive([bind(hyprlandService, 'focusedMonitor')], (monitor) => {
         if (monitor?.id === undefined) {
-            console.warn('No focused monitor available, defaulting to monitor 0');
+            if (!didWarnNoFocusedMonitor) {
+                console.warn('No focused monitor available, defaulting to monitor 0');
+                didWarnNoFocusedMonitor = true;
+            }
             curMonitor.set(0);
             return;
+        }
+
+        if (didWarnNoFocusedMonitor) {
+            didWarnNoFocusedMonitor = false;
         }
         curMonitor.set(monitor.id);
     });
@@ -70,7 +78,7 @@ export const trackActiveMonitor = (curMonitor: Variable<number>): void => {
  * @param popupNotifications The variable to update with the list of popup notifications.
  */
 export const trackPopupNotifications = (popupNotifications: Variable<AstalNotifd.Notification[]>): void => {
-    notifdService.connect('notified', (_, id) => {
+    notifdService.connect('notified', (_: unknown, id: number) => {
         const notification = notifdService.get_notification(id);
         const doNotDisturb = notifdService.dontDisturb;
 
@@ -99,7 +107,7 @@ export const trackPopupNotifications = (popupNotifications: Variable<AstalNotifd
         });
     });
 
-    notifdService.connect('resolved', (_, id) => {
+    notifdService.connect('resolved', (_: unknown, id: number) => {
         const filteredPopups = popupNotifications.get().filter((popupNotif) => popupNotif.id !== id);
 
         popupNotifications.set(filteredPopups);

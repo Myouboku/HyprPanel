@@ -15,6 +15,7 @@ const hyprlandService = AstalHyprland.get_default();
 const { enable, active_monitor, monitor } = options.theme.osd;
 
 const osdController = OsdRevealerController.getInstance();
+let didWarnNoFocusedMonitor = false;
 
 /**
  * Determines which monitor the OSD should appear on based on user configuration.
@@ -35,8 +36,15 @@ export const getOsdMonitor = (): Variable<number> => {
                 }
 
                 if (!currentMonitor || currentMonitor.id === undefined || currentMonitor.id === null) {
-                    console.warn('OSD: No focused monitor available, defaulting to monitor 0');
+                    if (!didWarnNoFocusedMonitor) {
+                        console.warn('OSD: No focused monitor available, defaulting to monitor 0');
+                        didWarnNoFocusedMonitor = true;
+                    }
                     return 0;
+                }
+
+                if (didWarnNoFocusedMonitor) {
+                    didWarnNoFocusedMonitor = false;
                 }
 
                 const gdkMonitor = gdkMonitorMapper.mapHyprlandToGdk(currentMonitor.id);

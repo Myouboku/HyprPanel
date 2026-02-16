@@ -1,5 +1,5 @@
 import { bind, Variable } from 'astal';
-import { App } from 'astal/gtk3';
+import { App, Gtk } from 'astal/gtk3';
 import AstalHyprland from 'gi://AstalHyprland?version=0.1';
 import options from 'src/configuration';
 import { BarVisibility } from '.';
@@ -95,13 +95,18 @@ export class BarAutoHideService {
             return;
         }
 
-        const window = App.get_window(barName);
-        if (window && !window.get_window()?.is_destroyed()) {
-            try {
-                window.set_visible(isVisible);
-            } catch (error) {
-                console.warn(`[BarAutoHide] Failed to set visibility for ${barName}:`, error);
-            }
+        const appWindowProvider = App as unknown as { get_windows: () => NamedWindow[] };
+        const window = appWindowProvider
+            .get_windows()
+            .find((candidate: NamedWindow) => candidate.name === barName);
+        if (!window || window.get_window()?.is_destroyed()) {
+            return;
+        }
+
+        try {
+            window.set_visible(isVisible);
+        } catch (error) {
+            console.warn(`[BarAutoHide] Failed to set visibility for ${barName}:`, error);
         }
     }
 
@@ -129,11 +134,16 @@ export class BarAutoHideService {
      */
     private _handleSingleWindowAutoHide(): void {
         const monitors = this._hyprlandService.get_monitors();
-        const activeWorkspaces = monitors.map((monitor) => monitor.active_workspace);
+        const activeWorkspaces = monitors.map((monitor: AstalHyprland.Monitor) => monitor.active_workspace);
 
-        activeWorkspaces.forEach((workspace) => {
+        activeWorkspaces.forEach((workspace: AstalHyprland.Workspace) => {
+            const monitorId = workspace.monitor?.id;
+            if (monitorId === undefined || monitorId === null) {
+                return;
+            }
+
             const hasOneClient = workspace.get_clients().length !== 1;
-            this._setBarVisibility(workspace.monitor.id, hasOneClient);
+            this._setBarVisibility(monitorId, hasOneClient);
         });
     }
 
@@ -143,7 +153,7 @@ export class BarAutoHideService {
     private _showAllBars(): void {
         const monitors = this._hyprlandService.get_monitors();
 
-        monitors.forEach((monitor) => {
+        monitors.forEach((monitor: AstalHyprland.Monitor) => {
             if (BarVisibility.get(`bar-${monitor.id}`)) {
                 this._setBarVisibility(monitor.id, true);
             }
@@ -154,8 +164,17 @@ export class BarAutoHideService {
      * Updates bar visibility based on workspace fullscreen state
      */
     private _updateBarVisibilityByFullscreen(): void {
-        this._hyprlandService.get_workspaces().forEach((workspace) => {
-            this._setBarVisibility(workspace.monitor.id, !workspace.hasFullscreen);
+        this._hyprlandService.get_workspaces().forEach((workspace: AstalHyprland.Workspace) => {
+            const monitorId = workspace.monitor?.id;
+            if (monitorId === undefined || monitorId === null) {
+                return;
+            }
+
+            this._setBarVisibility(monitorId, !workspace.hasFullscreen);
         });
     }
 }
+
+type NamedWindow = Gtk.Window & {
+    name?: string;
+};

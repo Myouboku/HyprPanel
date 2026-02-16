@@ -219,14 +219,20 @@ export class WorkspaceService {
      */
     private _navigateWorkspace(direction: 'next' | 'prev'): void {
         const allHyprlandWorkspaces = hyprlandService.get_workspaces() ?? [];
+        const focusedMonitorId = hyprlandService.focusedMonitor?.id;
+
+        if (focusedMonitorId === undefined || focusedMonitorId === null) {
+            return;
+        }
 
         const activeWorkspaceIds = allHyprlandWorkspaces
             .filter(
-                (workspaceInstance) => hyprlandService.focusedMonitor.id === workspaceInstance.monitor?.id,
+                (workspaceInstance: AstalHyprland.Workspace) =>
+                    focusedMonitorId === workspaceInstance.monitor?.id,
             )
-            .map((workspaceInstance) => workspaceInstance.id);
+            .map((workspaceInstance: AstalHyprland.Workspace) => workspaceInstance.id);
 
-        const assignedOrOccupiedWorkspaces = activeWorkspaceIds.sort((a, b) => a - b);
+        const assignedOrOccupiedWorkspaces = activeWorkspaceIds.sort((a: number, b: number) => a - b);
 
         if (assignedOrOccupiedWorkspaces.length === 0) {
             return;
