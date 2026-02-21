@@ -1,11 +1,16 @@
+$notification-menu-slide-distance: 30.6em * $bar-menus-menu-notifications-scaling * 0.01;
+$notification-menu-slide-distance-clear: $notification-menu-slide-distance * 1.2;
+
 @keyframes notification-menu-clear-slide-right {
     from {
         margin-left: 0em;
+        margin-right: 0em;
         opacity: 1;
     }
 
     to {
-        margin-left: 2.5em;
+        margin-left: $notification-menu-slide-distance-clear;
+        margin-right: -$notification-menu-slide-distance-clear;
         opacity: 0;
     }
 }
