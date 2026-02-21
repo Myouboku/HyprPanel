@@ -1,3 +1,15 @@
+@keyframes notification-menu-clear-slide-right {
+    from {
+        margin-left: 0em;
+        opacity: 1;
+    }
+
+    to {
+        margin-left: 2.5em;
+        opacity: 0;
+    }
+}
+
 .notification-menu-content * {
     font-size: $font-size * $bar-menus-menu-notifications-scaling * 0.01;
 }
@@ -38,6 +50,12 @@
         border: 0.15em solid $notification-border;
         border-radius: $notification-border_radius;
         margin: 0em;
+    }
+
+    .notification-card.menu.removing {
+        animation-name: notification-menu-clear-slide-right;
+        animation-timing-function: ease-in;
+        animation-fill-mode: forwards;
     }
 
     .notification-card-content-container {
@@ -146,12 +164,14 @@
 
     scrollbar {
         margin-right: 0.2em;
-        min-width: $bar-menus-menu-notifications-scrollbar-width * $bar-menus-menu-notifications-scaling * 0.01;
+        min-width: $bar-menus-menu-notifications-scrollbar-width * $bar-menus-menu-notifications-scaling *
+            0.01;
         border-radius: $bar-menus-menu-notifications-scrollbar-radius;
         background: transparent;
 
         slider {
-            min-width: $bar-menus-menu-notifications-scrollbar-width * $bar-menus-menu-notifications-scaling * 0.01;
+            min-width: $bar-menus-menu-notifications-scrollbar-width * $bar-menus-menu-notifications-scaling *
+                0.01;
             border-radius: $bar-menus-menu-notifications-scrollbar-radius;
             background: $bar-menus-menu-notifications-scrollbar-color;
         }
@@ -177,7 +197,11 @@
     margin-bottom: 8em;
 
     label {
-        color: if($bar-menus-monochrome, $bar-menus-feinttext, $bar-menus-menu-notifications-no_notifications_label);
+        color: if(
+            $bar-menus-monochrome,
+            $bar-menus-feinttext,
+            $bar-menus-menu-notifications-no_notifications_label
+        );
     }
 
     .bell {

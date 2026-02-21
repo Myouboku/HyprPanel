@@ -6,6 +6,58 @@ import icons from 'src/lib/icons/icons';
 const normalizeName = (name: string): string => name.toLowerCase().replace(/\s+/g, '_');
 
 export const removingNotifications = Variable(false);
+export const dismissingNotifications = Variable<Set<AstalNotifd.Notification>>(new Set());
+
+const clampAnimationDuration = (duration: number): number => {
+    return Math.max(0, duration);
+};
+
+const addDismissingNotification = (notification: AstalNotifd.Notification): void => {
+    const current = dismissingNotifications.get();
+
+    if (current.has(notification)) {
+        return;
+    }
+
+    const next = new Set(current);
+    next.add(notification);
+    dismissingNotifications.set(next);
+};
+
+const removeDismissingNotification = (notification: AstalNotifd.Notification): void => {
+    const current = dismissingNotifications.get();
+
+    if (!current.has(notification)) {
+        return;
+    }
+
+    const next = new Set(current);
+    next.delete(notification);
+    dismissingNotifications.set(next);
+};
+
+export const dismissNotificationWithAnimation = (
+    notification: AstalNotifd.Notification,
+    animationDuration: number,
+): void => {
+    const duration = clampAnimationDuration(animationDuration);
+
+    if (duration === 0) {
+        notification.dismiss();
+        return;
+    }
+
+    if (dismissingNotifications.get().has(notification)) {
+        return;
+    }
+
+    addDismissingNotification(notification);
+
+    setTimeout(() => {
+        notification.dismiss();
+        removeDismissingNotification(notification);
+    }, duration);
+};
 
 export const isNotificationIgnored = (
     notification: AstalNotifd.Notification | null,
@@ -61,12 +113,22 @@ export const getNotificationIcon = (app_name: string, app_icon: string, app_entr
 
 export const clearNotifications = async (
     notifications: AstalNotifd.Notification[],
-    delay: number,
+    animationDuration: number,
 ): Promise<void> => {
+    if (notifications.length === 0) {
+        return;
+    }
+
+    const duration = clampAnimationDuration(animationDuration);
+
     removingNotifications.set(true);
-    for (const notification of notifications) {
-        notification.dismiss();
-        await new Promise((resolve) => setTimeout(resolve, delay));
+
+    notifications.forEach((notification) => {
+        dismissNotificationWithAnimation(notification, duration);
+    });
+
+    if (duration > 0) {
+        await new Promise((resolve) => setTimeout(resolve, duration));
     }
     removingNotifications.set(false);
 };

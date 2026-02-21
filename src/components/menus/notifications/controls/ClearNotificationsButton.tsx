@@ -1,4 +1,5 @@
 import { bind } from 'astal';
+import type { Astal, Gtk } from 'astal/gtk3';
 import AstalNotifd from 'gi://AstalNotifd?version=0.1';
 import options from 'src/configuration';
 import { isPrimaryClick } from 'src/lib/events/mouse';
@@ -6,14 +7,14 @@ import { clearNotifications, removingNotifications } from 'src/lib/shared/notifi
 
 const notifdService = AstalNotifd.get_default();
 
-const { clearDelay } = options.notifications;
+const { clearAnimationDuration } = options.notifications;
 
 export const ClearNotificationsButton = (): JSX.Element => {
     return (
         <button
             className={'clear-notifications-button'}
             tooltipText={'Clear Notifications'}
-            onClick={(_, event) => {
+            onClick={(_: Gtk.Widget, event: Astal.ClickEvent) => {
                 if (!isPrimaryClick(event)) {
                     return;
                 }
@@ -22,7 +23,7 @@ export const ClearNotificationsButton = (): JSX.Element => {
                     return;
                 }
 
-                clearNotifications(notifdService.get_notifications(), clearDelay.get());
+                clearNotifications(notifdService.get_notifications(), clearAnimationDuration.get());
             }}
         >
             <label

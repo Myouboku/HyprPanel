@@ -4,11 +4,19 @@ import { bind, Variable } from 'astal';
 import { Placeholder } from './Placeholder';
 import { NotificationCard } from 'src/components/notifications/Notification';
 import options from 'src/configuration';
-import { filterNotifications } from 'src/lib/shared/notifications';
+import {
+    dismissNotificationWithAnimation,
+    dismissingNotifications,
+    filterNotifications,
+} from 'src/lib/shared/notifications';
 
 const notifdService = AstalNotifd.get_default();
 
-const { displayedTotal, ignore, showActionsOnHover } = options.notifications;
+const { displayedTotal, ignore, showActionsOnHover, clearAnimationDuration } = options.notifications;
+
+type NotificationCardWidget = Gtk.Widget & {
+    toggleClassName: (className: string, enabled?: boolean) => void;
+};
 
 export const NotificationsContainer = ({ curPage }: NotificationsContainerProps): JSX.Element => {
     return (
@@ -39,6 +47,10 @@ export const NotificationsContainer = ({ curPage }: NotificationsContainerProps)
                         const pageStart = (currentPage - 1) * totalDisplayed;
                         const pageEnd = currentPage * totalDisplayed;
 
+                        const handleDismiss = (notification: AstalNotifd.Notification): void => {
+                            dismissNotificationWithAnimation(notification, clearAnimationDuration.get());
+                        };
+
                         return (
                             <box
                                 className={'notification-card-content-container'}
@@ -52,8 +64,29 @@ export const NotificationsContainer = ({ curPage }: NotificationsContainerProps)
                                         return (
                                             <NotificationCard
                                                 className={'notification-card menu'}
+                                                css={bind(clearAnimationDuration).as(
+                                                    (duration) => `animation-duration: ${duration}ms;`,
+                                                )}
                                                 notification={notification}
                                                 showActions={hoverActions}
+                                                onDismiss={handleDismiss}
+                                                setup={(self: NotificationCardWidget) => {
+                                                    const updateClass = (
+                                                        dismissing: Set<AstalNotifd.Notification>,
+                                                    ): void => {
+                                                        self.toggleClassName(
+                                                            'removing',
+                                                            dismissing.has(notification),
+                                                        );
+                                                    };
+
+                                                    updateClass(dismissingNotifications.get());
+
+                                                    const unsubscribe =
+                                                        dismissingNotifications.subscribe(updateClass);
+
+                                                    self.connect('destroy', unsubscribe);
+                                                }}
                                             />
                                         );
                                     })}

@@ -1,5 +1,6 @@
 import AstalNotifd from 'gi://AstalNotifd?version=0.1';
-import { Gtk, Widget } from 'astal/gtk3';
+import type { Binding } from 'astal';
+import { Astal, Gtk, Widget } from 'astal/gtk3';
 import { isSecondaryClick } from 'src/lib/events/mouse';
 import { Actions } from '../Actions';
 import { Body } from '../Body';
@@ -25,6 +26,7 @@ const NotificationContent = ({ actionBox, notification }: NotificationContentPro
 export const NotificationCard = ({
     notification,
     showActions,
+    onDismiss,
     ...props
 }: NotificationCardProps): JSX.Element => {
     let actionBox: ActionBox | null;
@@ -35,11 +37,20 @@ export const NotificationCard = ({
         actionBox = null;
     }
 
+    const handleDismiss = (): void => {
+        if (onDismiss) {
+            onDismiss(notification);
+            return;
+        }
+
+        notification.dismiss();
+    };
+
     return (
         <eventbox
-            onClick={(_, event) => {
+            onClick={(_: Gtk.Widget, event: Astal.ClickEvent) => {
                 if (isSecondaryClick(event)) {
-                    notification.dismiss();
+                    handleDismiss();
                 }
             }}
             onHover={() => {
@@ -56,15 +67,18 @@ export const NotificationCard = ({
             <box className={'notification-card'} {...props} hexpand valign={Gtk.Align.START}>
                 <Image notification={notification} />
                 <NotificationContent notification={notification} actionBox={actionBox} />
-                <CloseButton notification={notification} />
+                <CloseButton notification={notification} onDismiss={handleDismiss} />
             </box>
         </eventbox>
     );
 };
 
 interface NotificationCardProps extends Widget.BoxProps {
+    className?: string | Binding<string>;
+    css?: string | Binding<string>;
     notification: AstalNotifd.Notification;
     showActions: boolean;
+    onDismiss?: (notification: AstalNotifd.Notification) => void;
 }
 
 interface ActionBox extends Gtk.Widget {

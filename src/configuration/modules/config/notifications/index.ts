@@ -11,7 +11,7 @@ export default {
     timeout: opt(7000),
     autoDismiss: opt(false),
     cache_actions: opt(true),
-    clearDelay: opt(100),
+    clearAnimationDuration: opt(200),
     playSound: opt(true),
     soundName: opt('message-new-instant'),
     customSoundPath: opt(''),

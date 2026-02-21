@@ -95,9 +95,9 @@ export const NotificationSettings = (): JSX.Element => {
                     type="boolean"
                 />
                 <Option
-                    opt={options.notifications.clearDelay}
-                    title="Clear Delay"
-                    subtitle="Delay in ms before clearing a notification"
+                    opt={options.notifications.clearAnimationDuration}
+                    title="Clear Animation Duration"
+                    subtitle="Duration in ms for the notification clear animation"
                     type="number"
                     increment={20}
                 />

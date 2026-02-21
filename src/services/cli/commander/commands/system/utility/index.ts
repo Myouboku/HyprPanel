@@ -10,7 +10,7 @@ import { clearNotifications } from 'src/lib/shared/notifications';
 import options from 'src/configuration';
 import { listCpuTempSensors } from '../sensors';
 
-const { clearDelay } = options.notifications;
+const { clearAnimationDuration } = options.notifications;
 const notifdService = AstalNotifd.get_default();
 const audio = AstalWp.get_default();
 
@@ -38,7 +38,7 @@ export const utilityCommands: Command[] = [
         handler: (): string => {
             try {
                 const allNotifications = notifdService.get_notifications();
-                clearNotifications(allNotifications, clearDelay.get());
+                clearNotifications(allNotifications, clearAnimationDuration.get());
 
                 return 'Notifications cleared successfully.';
             } catch (error) {
